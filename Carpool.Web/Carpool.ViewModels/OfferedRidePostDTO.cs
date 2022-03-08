@@ -1,6 +1,6 @@
 ﻿namespace Carpool.Web.ViewModels
 {
-    public class OfferedRidePost
+    public class OfferedRidePostDTO
     {
         public DateTime Date { get; set; }
         public string Time { get; set; } = null!;

@@ -16,7 +16,7 @@ namespace Carpool.Web.Controllers
         private readonly Mapper mapper = new();
         //to sign in 
         [HttpPost("Signup")]
-        public IActionResult Signup([FromBody] UserPost Newuser )
+        public IActionResult Signup([FromBody] UserDTO Newuser )
         {
             return Ok(user.Signup(Newuser.Uname, Newuser.Password));
         }
@@ -31,7 +31,7 @@ namespace Carpool.Web.Controllers
 
         // POST api/<tpoolController>
         [HttpPost("OfferRide")]
-        public IActionResult OfferRide([FromBody] OfferedRidePost Ride)
+        public IActionResult OfferRide([FromBody] OfferedRidePostDTO Ride)
         {
             return Ok(user.OfferRide(Ride.Date, Ride.Time, Ride.FromPlace, Ride.ToPlace, Ride.Stops, (float)Ride.Price, Ride.Seats));
 
@@ -40,7 +40,7 @@ namespace Carpool.Web.Controllers
 
         //to book a ride
         [HttpPost("BookRide")]
-        public IActionResult BookRide([FromBody] BookedRideView Ride)
+        public IActionResult BookRide([FromBody] ViewModels.BookedRideDTO Ride)
         {
             return Ok(user.BookRide(Ride.OfferId, Ride.Seats));
         }
@@ -48,9 +48,9 @@ namespace Carpool.Web.Controllers
 
         //to know the available rides 
         [HttpGet("AvailableRides/{date,time,fromplace,toplace,seats}")]
-        public IEnumerable<OfferedRideView> AvailableRides(DateTime date, string time, string fromplace, string toplace, int seats)
+        public IEnumerable<OfferedRideDTO> AvailableRides(DateTime date, string time, string fromplace, string toplace, int seats)
         {
-            List<OfferedRideView> res = new();
+            List<OfferedRideDTO> res = new();
             foreach (OfferedRide Ride in user.AvailableRides(date, time, fromplace, toplace, seats))
             {
                 res.Add(mapper.Map(Ride));
@@ -63,9 +63,9 @@ namespace Carpool.Web.Controllers
         // GET: api/<tpoolController>
         //to get the history of rides 
         [HttpGet("History")]
-        public IEnumerable<OfferedRideView> History()
+        public IEnumerable<OfferedRideDTO> History()
         {
-            List<OfferedRideView> res = new();
+            List<OfferedRideDTO> res = new();
             foreach (OfferedRide Ride in user.OfferedRides())
             {
                 res.Add(mapper.Map(Ride));

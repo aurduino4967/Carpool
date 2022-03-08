@@ -1,6 +1,6 @@
 ﻿namespace Carpool.Web.ViewModels
 {
-    public class OfferedRideView
+    public class OfferedRideDTO
     {
         public string OfferId { get; set; } = null!;
         public string OfferedBy { get; set; } = null!;

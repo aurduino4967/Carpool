@@ -5,9 +5,9 @@ namespace Carpool.Web.Mappers
     public class Mapper
     {
 
-        public OfferedRideView Map(OfferedRide servicemodel)
+        public OfferedRideDTO Map(OfferedRide servicemodel)
         {
-            OfferedRideView Ride = new()
+            OfferedRideDTO Ride = new()
             {
                 Date = servicemodel.Date,
                 FromPlace = servicemodel.FromPlace,
@@ -25,9 +25,9 @@ namespace Carpool.Web.Mappers
 
 
 
-        public BookedRideView Map( BookedRide servicemodel)
+        public ViewModels.BookedRideDTO Map(Core.ServiceModels.BookedRide servicemodel)
         {
-            BookedRideView Ride = new()
+            ViewModels.BookedRideDTO Ride = new()
             {
                 Seats = servicemodel.Seats,
                 Price = servicemodel.Price,
