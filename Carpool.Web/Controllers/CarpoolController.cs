@@ -12,7 +12,7 @@ namespace Carpool.Web.Controllers
     public class CarpoolController : ControllerBase
     {
 
-        private readonly CarpoolUserService user = new();
+        private readonly CarpoolUserService user = new(new CarpoolDBService());
         private readonly Mapper mapper = new();
         //to sign in 
         [HttpPost("Signup")]

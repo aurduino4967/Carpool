@@ -11,10 +11,10 @@ namespace Carpool.Core.Services
     public  class CarpoolUserService: CarpoolUserServiceImp
     {
         private string Email = String.Empty;
-        private CarpoolDBService DBObject;
-        public CarpoolUserService()
+        private readonly CarpoolDBImp DBObject;
+        public CarpoolUserService(CarpoolDBImp DBObject)
         {
-           DBObject = new CarpoolDBService();
+            this.DBObject = DBObject;
         }
 
         public bool IsAuthorized()
