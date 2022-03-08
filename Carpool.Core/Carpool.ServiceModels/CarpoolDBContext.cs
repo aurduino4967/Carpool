@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
-namespace Carpool.Models
+namespace Carpool.Core.ServiceModels
 {
     public partial class CarpoolDBContext : DbContext
     {

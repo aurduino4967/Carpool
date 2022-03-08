@@ -3,18 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Carpool.Models;
-using Carpool.Interfaces;
+using Carpool.Core.ServiceModels;
+using Carpool.Core.Interfaces;
 
-namespace Carpool.Services
+namespace Carpool.Core.Services
 {
-    public  class CarpoolService: CarpoolServiceInterface
+    public  class CarpoolUserService: CarpoolUserServiceImp
     {
         private string Email = String.Empty;
-        private CarpoolDBContext context;
-        public CarpoolService()
+        private CarpoolDBService DBObject;
+        public CarpoolUserService()
         {
-           context = new CarpoolDBContext();
+           DBObject = new CarpoolDBService();
         }
 
         public bool IsAuthorized()
@@ -29,16 +29,8 @@ namespace Carpool.Services
                 Uname = email,
                 Password = password
             };
-            try
-            {
-                context.Users.Add(Newuser);
-                context.SaveChanges();
-                return "done succcessfully";
-            }
-            catch(Exception e)
-            {
-                return e.Message;
-            }
+            return DBObject.CreateNewUser(Newuser);
+            
         }
 
         public List<OfferedRide> AvailableRides(DateTime date, string time, string fromplace, string toplace, int seats)
@@ -50,7 +42,7 @@ namespace Carpool.Services
             try
             {
 
-                foreach (OfferedRide Ride in context.OfferedRides)
+                foreach (OfferedRide Ride in DBObject.GetOfferedRides())
                 {
                     flag = false;
                     
@@ -90,23 +82,24 @@ namespace Carpool.Services
 
         public string Login(string email, string password)
         {
-
             try
             {
-                User? user = context.Users.SingleOrDefault(o => o.Uname.TrimEnd() == email && o.Password.TrimEnd() == password);
-                if(user == null)
+                User? CurrentUser = DBObject.GetUser(email, password);
+                if (CurrentUser != null)
                 {
-                    return "invalid user id";
+                    Email = CurrentUser.Uname;
+                    return "done successfully";
                 }
+
                 else
-                {   
-                    Email = email;
-                    return "Logged in successfully ";         
+                {
+                    return "invalid login credentials";
                 }
             }
-            catch(Exception ex)
-            { return ex.Message; }
-
+            catch (Exception ex)    
+            {
+                return ex.Message;
+            }
 
         }
 
@@ -127,15 +120,7 @@ namespace Carpool.Services
                     newride.Price = price;
                     newride.Seats = seats;
                 }
-                try
-                {
-                    context.OfferedRides.Add(newride);
-                    context.SaveChanges();
-                }
-                catch(Exception e)
-                { return e.Message; }
-
-                return "done successfully";
+                return DBObject.CreateNewOfferedRide(newride);
             }
             else 
             { return "do login"; }
@@ -148,25 +133,22 @@ namespace Carpool.Services
         {
             if (IsAuthorized())
             {
-
                 try
                 {
-                    OfferedRide? Ride = context.OfferedRides.SingleOrDefault(o => o.OfferId == offerid);
+                    OfferedRide? Ride = DBObject.GetOfferedRideById(offerid);
                     if (Ride != null)
                     {
                         BookedRide booking = new BookedRide()
                         {
                             OfferId = offerid,
                             Seats = seats,
-                            BookedBy = Email
+                            BookedBy = Email,
+                            Price = Ride.Price * seats
                         };
 
-
-                        booking.Price = Ride.Price * seats;
                         Ride.Seats -= seats;
-                        context.BookedRides.Add(booking);
-                        context.OfferedRides.Update(Ride);
-                        context.SaveChanges();
+                        DBObject.CreateNewBookedRide(booking);
+                        DBObject.UpdateOfferedRide(Ride);
                         return "Ride Booked Successfully";
                     }
                     else
@@ -175,7 +157,6 @@ namespace Carpool.Services
                 }
                 catch (Exception e)
                 { return e.Message; }
-                
             }
             else
             { return "Do LogIn "; }
@@ -189,7 +170,7 @@ namespace Carpool.Services
 
             List<OfferedRide> res = new List<OfferedRide>();
 
-            foreach (OfferedRide Ride in context.OfferedRides)
+            foreach (OfferedRide Ride in DBObject.GetOfferedRides())
             {
                 if (Ride.OfferedBy.TrimEnd() == Email)
                 {
@@ -207,17 +188,17 @@ namespace Carpool.Services
         {
 
             List<OfferedRide> res = new();
-            List<BookedRide> tres=new List<BookedRide>();   
+            List<BookedRide> Bookings=new List<BookedRide>();   
 
-            foreach (BookedRide Ride in context.BookedRides)
+            foreach (BookedRide booked in DBObject.GetBookedRides())
             {
-                if (Ride.BookedBy.TrimEnd() == Email)
+                if (booked.BookedBy.TrimEnd() == Email)
                 {
-                    tres.Add(Ride);
+                    Bookings.Add(booked);
                 }
             }
-            foreach(BookedRide Ride in tres)
-                    res.Add(context.OfferedRides.SingleOrDefault(o=>o.OfferId==Ride.OfferId));
+            foreach(BookedRide Booked in Bookings)
+                    res.Add(item: DBObject.GetOfferedRideById(Booked.OfferId));
             return res;
 
         }

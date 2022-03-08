@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Carpool.Models
+namespace Carpool.Core.ServiceModels
 {
     public partial class BookedRide
     {

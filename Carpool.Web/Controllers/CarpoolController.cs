@@ -1,18 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Carpool.Services;
-using Carpool.Models;
+using Carpool.Core.Services;
+using Carpool.Core.ServiceModels;
 using Carpool.Web.ViewModels;
-
+using Carpool.Web.Mappers;
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
-namespace Carpool.WebApi.Controllers
+namespace Carpool.Web.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     public class CarpoolController : ControllerBase
     {
 
-        private readonly CarpoolService user = new();
+        private readonly CarpoolUserService user = new();
         private readonly Mapper mapper = new();
         //to sign in 
         [HttpPost("Signup")]

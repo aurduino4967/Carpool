@@ -1,10 +1,10 @@
-﻿using Carpool.WebApi;
-using Carpool.Models;
+﻿using Carpool.Core.ServiceModels;
 using Carpool.Web.ViewModels;
-namespace Carpool.WebApi
-{
+namespace Carpool.Web.Mappers
+{ 
     public class Mapper
     {
+
         public OfferedRideView Map(OfferedRide servicemodel)
         {
             OfferedRideView Ride = new()
@@ -22,6 +22,9 @@ namespace Carpool.WebApi
             };
             return Ride;
         }
+
+
+
         public BookedRideView Map( BookedRide servicemodel)
         {
             BookedRideView Ride = new()
@@ -33,6 +36,8 @@ namespace Carpool.WebApi
             };
             return Ride;
         }
+
+
     }
     
 }

@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Carpool.Models;
+using Carpool.Core.ServiceModels;
 
-namespace Carpool.Interfaces
+namespace Carpool.Core.Interfaces
 {
-    public  interface CarpoolServiceInterface
+    public  interface CarpoolUserServiceImp
     {
         public string Signup(string email, string password);
         public string Login(string email, string password);
@@ -16,5 +16,6 @@ namespace Carpool.Interfaces
         public List<OfferedRide> OfferedRides();
         public List<OfferedRide> BookedRides();
         public List<OfferedRide> AvailableRides(DateTime date, string time, string fromplace, string toplace, int seats);
+        
     }
 }
