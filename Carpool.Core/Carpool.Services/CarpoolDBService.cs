@@ -36,9 +36,9 @@ namespace Carpool.Core.Services
             return rides;
         }
 
-        public User? GetUser(string email, string password)
+        public User? GetUser(User ExistingUser)
         {
-                User? CurrentUser = Context.Users.SingleOrDefault(o => o.Uname.TrimEnd() == email && o.Password.TrimEnd() == password);
+                User? CurrentUser = Context.Users.SingleOrDefault(o => o.Uname.TrimEnd() == ExistingUser.Uname && o.Password.TrimEnd() == ExistingUser.Password);
                 if (CurrentUser != null)
                     return CurrentUser;
                 else

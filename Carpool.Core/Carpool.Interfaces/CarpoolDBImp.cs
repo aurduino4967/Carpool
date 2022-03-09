@@ -11,7 +11,7 @@ namespace Carpool.Core.Interfaces
     {
         public string CreateNewUser(User NewUser);
         public List<OfferedRide> GetOfferedRides();
-        public User? GetUser(string email, string password);
+        public User? GetUser(User ExistingUser);
         public string CreateNewOfferedRide(OfferedRide Ride);
         public void CreateNewBookedRide(BookedRide Ride);
         public void UpdateOfferedRide(OfferedRide Ride);

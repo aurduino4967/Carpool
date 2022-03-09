@@ -25,9 +25,9 @@ namespace Carpool.Web.Mappers
 
 
 
-        public ViewModels.BookedRideDTO Map(Core.ServiceModels.BookedRide servicemodel)
+        public BookedRideDTO Map(BookedRide servicemodel)
         {
-            ViewModels.BookedRideDTO Ride = new()
+            BookedRideDTO Ride = new()
             {
                 Seats = servicemodel.Seats,
                 Price = servicemodel.Price,
@@ -37,7 +37,40 @@ namespace Carpool.Web.Mappers
             return Ride;
         }
 
+        public BookedRide Map(BookRidePostDTO viewmodel)
+        {
+            BookedRide servicemodel = new()
+            {
+                Seats = viewmodel.Seats,
+                OfferId = viewmodel.OfferId,
 
+            };
+            return servicemodel;
+        }
+        public OfferedRide Map(OfferedRidePostDTO viewmodel)
+        {
+            OfferedRide servicemodel = new()
+            {
+                Time = viewmodel.Time,
+                Date = viewmodel.Date,
+                Price = viewmodel.Price,
+                Seats = viewmodel.Seats,
+                FromPlace = viewmodel.FromPlace,
+                Stops = viewmodel.Stops,
+                ToPlace = viewmodel.ToPlace,
+            };
+            return servicemodel;
+        }
+        public User Map(UserDTO viewmodel)
+        {
+            User servicemodel = new()
+            {
+                Uname = viewmodel.Uname,
+                Password =viewmodel.Password,
+            };
+            return servicemodel;
+
+        }
     }
     
 }

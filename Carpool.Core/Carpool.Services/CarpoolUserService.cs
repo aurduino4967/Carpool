@@ -5,16 +5,16 @@ using System.Text;
 using System.Threading.Tasks;
 using Carpool.Core.ServiceModels;
 using Carpool.Core.Interfaces;
-
 namespace Carpool.Core.Services
 {
     public  class CarpoolUserService: CarpoolUserServiceImp
     {
-        private string Email = String.Empty;
+        private string Email;
         private readonly CarpoolDBImp DBObject;
-        public CarpoolUserService(CarpoolDBImp DBObject)
+        public CarpoolUserService(CarpoolDBImp DBObj)
         {
-            this.DBObject = DBObject;
+            DBObject = DBObj;
+            Email=string.Empty;
         }
 
         public bool IsAuthorized()
@@ -22,22 +22,15 @@ namespace Carpool.Core.Services
             return !string.IsNullOrEmpty(Email);
         }
      
-        public string Signup(String email, String password)
+        public string Signup(User NewUser)
         {
-            User Newuser = new()
-            {
-                Uname = email,
-                Password = password
-            };
-            return DBObject.CreateNewUser(Newuser);
-            
+            return DBObject.CreateNewUser(NewUser);
         }
 
-        public List<OfferedRide> AvailableRides(DateTime date, string time, string fromplace, string toplace, int seats)
+        public List<OfferedRide> AvailableRides(OfferedRide SearchRide)
         {
             List<OfferedRide> res = new();
             bool flag;
-            toplace=toplace.ToLower();
             string[] stops;
             try
             {
@@ -46,7 +39,7 @@ namespace Carpool.Core.Services
                 {
                     flag = false;
                     
-                    if (Ride.Date == date && Ride.Time.TrimEnd() == time && Ride.FromPlace.TrimEnd() == fromplace.ToLower() && Ride.Seats >= seats)
+                    if (Ride.Date == SearchRide.Date && Ride.Time.TrimEnd() == SearchRide.Time && Ride.FromPlace.TrimEnd() == SearchRide.FromPlace.ToLower() && Ride.Seats >= SearchRide.Seats)
                     {
                         if (Ride.Stops != null && Ride.Stops.Contains(','))
                         {
@@ -55,14 +48,14 @@ namespace Carpool.Core.Services
 
                             foreach (string stop in stops)
                             {
-                                if (stop.TrimEnd().Equals(toplace) || Ride.ToPlace.Equals(toplace))
+                                if (stop.TrimEnd().Equals(SearchRide.ToPlace) || Ride.ToPlace.Equals(SearchRide.ToPlace))
                                 {
                                     flag = true;
                                 }
 
                             }
                         }
-                        else if ((Ride.Stops != null && Ride.Stops.TrimEnd() == toplace) || Ride.ToPlace == toplace)
+                        else if ((Ride.Stops != null && Ride.Stops.TrimEnd().Equals(SearchRide.ToPlace) || Ride.ToPlace.Equals(SearchRide.ToPlace)))
                             flag = true;
 
                         
@@ -80,15 +73,15 @@ namespace Carpool.Core.Services
        
 
 
-        public string Login(string email, string password)
+        public string Login(User ExistingUser)
         {
             try
             {
-                User? CurrentUser = DBObject.GetUser(email, password);
+                User? CurrentUser = DBObject.GetUser(ExistingUser);
                 if (CurrentUser != null)
                 {
-                    Email = CurrentUser.Uname;
-                    return "done successfully";
+                    Email = CurrentUser.Uname.TrimEnd();
+                    return "done successfully" ;
                 }
 
                 else
@@ -103,24 +96,14 @@ namespace Carpool.Core.Services
 
         }
 
-        public string OfferRide(DateTime date, string time, string from, string to, string stops,float price, int seats)
+        public string OfferRide(OfferedRide NewRide)
         {
             if (IsAuthorized())
             {
+                NewRide.OfferedBy = Email;
+                NewRide.OfferId = NewRide.OfferedBy + DateTime.Now.ToString("yyyyMMdd") + DateTime.Now.ToString("HHmmss");
 
-                OfferedRide newride = new();
-                {
-                    newride.OfferedBy = Email;
-                    newride.OfferId = newride.OfferedBy + DateTime.Now.ToString("yyyyMMdd") + DateTime.Now.ToString("HHmmss");
-                    newride.Date = date;
-                    newride.Time = time;
-                    newride.FromPlace = from.ToLower();
-                    newride.ToPlace = to.ToLower();
-                    newride.Stops = stops;
-                    newride.Price = price;
-                    newride.Seats = seats;
-                }
-                return DBObject.CreateNewOfferedRide(newride);
+                return DBObject.CreateNewOfferedRide(NewRide);
             }
             else 
             { return "do login"; }
@@ -129,25 +112,22 @@ namespace Carpool.Core.Services
         }
 
 
-        public string BookRide(string offerid, int seats)
+        public string BookRide(BookedRide NewRideBook)
         {
             if (IsAuthorized())
             {
                 try
                 {
-                    OfferedRide? Ride = DBObject.GetOfferedRideById(offerid);
+                    OfferedRide? Ride = DBObject.GetOfferedRideById(NewRideBook.OfferId);
                     if (Ride != null)
                     {
-                        BookedRide booking = new BookedRide()
-                        {
-                            OfferId = offerid,
-                            Seats = seats,
-                            BookedBy = Email,
-                            Price = Ride.Price * seats
-                        };
 
-                        Ride.Seats -= seats;
-                        DBObject.CreateNewBookedRide(booking);
+                        NewRideBook.BookedBy = Email;
+                        NewRideBook.Price = Ride.Price * NewRideBook.Seats;
+                        
+
+                        Ride.Seats -= NewRideBook.Seats;
+                        DBObject.CreateNewBookedRide(NewRideBook);
                         DBObject.UpdateOfferedRide(Ride);
                         return "Ride Booked Successfully";
                     }

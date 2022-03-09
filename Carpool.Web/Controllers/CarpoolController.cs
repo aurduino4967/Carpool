@@ -3,6 +3,7 @@ using Carpool.Core.Services;
 using Carpool.Core.ServiceModels;
 using Carpool.Web.ViewModels;
 using Carpool.Web.Mappers;
+using Carpool.Core.Interfaces;
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Carpool.Web.Controllers
@@ -12,20 +13,26 @@ namespace Carpool.Web.Controllers
     public class CarpoolController : ControllerBase
     {
 
-        private readonly CarpoolUserService user = new(new CarpoolDBService());
+        private readonly CarpoolUserServiceImp user=new CarpoolUserService(new CarpoolDBService());
         private readonly Mapper mapper = new();
         //to sign in 
+    
         [HttpPost("Signup")]
         public IActionResult Signup([FromBody] UserDTO Newuser )
         {
-            return Ok(user.Signup(Newuser.Uname, Newuser.Password));
+            return Ok(user.Signup(mapper.Map(Newuser)));
         }
 
         //to login to the portal
         [HttpGet("login/{id,password}")]
-        public IActionResult Login(string id, string password)
+        public IActionResult Login(string id,string password)
         {
-             return Ok(user.Login(id,password));
+            UserDTO ExistingUser = new()
+            {
+                Uname = id,
+                Password = password,
+            };
+             return Ok(user.Login(mapper.Map(ExistingUser)));
         }
     
 
@@ -33,16 +40,16 @@ namespace Carpool.Web.Controllers
         [HttpPost("OfferRide")]
         public IActionResult OfferRide([FromBody] OfferedRidePostDTO Ride)
         {
-            return Ok(user.OfferRide(Ride.Date, Ride.Time, Ride.FromPlace, Ride.ToPlace, Ride.Stops, (float)Ride.Price, Ride.Seats));
+            return Ok(user.OfferRide(mapper.Map(Ride)));
 
         }
 
 
         //to book a ride
         [HttpPost("BookRide")]
-        public IActionResult BookRide([FromBody] ViewModels.BookedRideDTO Ride)
+        public IActionResult BookRide([FromBody] BookRidePostDTO Ride)
         {
-            return Ok(user.BookRide(Ride.OfferId, Ride.Seats));
+            return Ok(user.BookRide(mapper.Map(Ride)));
         }
 
 
@@ -51,10 +58,18 @@ namespace Carpool.Web.Controllers
         public IEnumerable<OfferedRideDTO> AvailableRides(DateTime date, string time, string fromplace, string toplace, int seats)
         {
             List<OfferedRideDTO> res = new();
-            foreach (OfferedRide Ride in user.AvailableRides(date, time, fromplace, toplace, seats))
+            OfferedRide SearchRide = new()
+            {
+                Date = date,
+                Time = time,
+                FromPlace = fromplace,
+                ToPlace = toplace,
+                Seats = seats,
+
+            };
+            foreach (OfferedRide Ride in user.AvailableRides(SearchRide))
             {
                 res.Add(mapper.Map(Ride));
-
             }
             return res;
         }
@@ -74,11 +89,14 @@ namespace Carpool.Web.Controllers
             foreach (OfferedRide Ride in user.BookedRides())
             {
                 res.Add(mapper.Map(Ride));
-
             }
             return res;
         }
-  
+        [HttpGet("IsAuthorized")]
+        public IActionResult IsAuthorized()
+        {
+            return Ok(user.IsAuthorized());
+        }
        
     }
 }
