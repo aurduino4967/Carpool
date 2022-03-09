@@ -13,7 +13,7 @@ namespace Carpool.Web.Controllers
     public class CarpoolController : ControllerBase
     {
 
-        private readonly CarpoolUserServiceImp user=new CarpoolUserService(new CarpoolDBService());
+        private readonly CarpoolUserService user=new CarpoolUserService(new CarpoolDBService());
         private readonly Mapper mapper = new();
         //to sign in 
     
@@ -95,7 +95,7 @@ namespace Carpool.Web.Controllers
         [HttpGet("IsAuthorized")]
         public IActionResult IsAuthorized()
         {
-            return Ok(user.IsAuthorized());
+            return Ok(user.GetEmail());
         }
        
     }

@@ -9,12 +9,11 @@ namespace Carpool.Core.Services
 {
     public  class CarpoolUserService: CarpoolUserServiceImp
     {
-        private string Email;
         private readonly CarpoolDBImp DBObject;
+        private string Email=string.Empty;
         public CarpoolUserService(CarpoolDBImp DBObj)
         {
             DBObject = DBObj;
-            Email=string.Empty;
         }
 
         public bool IsAuthorized()
@@ -29,23 +28,23 @@ namespace Carpool.Core.Services
 
         public List<OfferedRide> AvailableRides(OfferedRide SearchRide)
         {
-            List<OfferedRide> res = new();
+            List<OfferedRide> MatchedRides = new();
             bool flag;
             string[] stops;
             try
             {
-
+                //iterating over each ride for a match
                 foreach (OfferedRide Ride in DBObject.GetOfferedRides())
                 {
-                    flag = false;
-                    
+                    flag = false;   //a flag which tells that the ride has perfectly matched search ride initially it is false
+                    //if the ride matches all the requirements except toplace
                     if (Ride.Date == SearchRide.Date && Ride.Time.TrimEnd() == SearchRide.Time && Ride.FromPlace.TrimEnd() == SearchRide.FromPlace.ToLower() && Ride.Seats >= SearchRide.Seats)
                     {
                         if (Ride.Stops != null && Ride.Stops.Contains(','))
                         {
                             stops = Ride.Stops.Split(',');
 
-
+                            //if the matched raid contains multiple stops
                             foreach (string stop in stops)
                             {
                                 if (stop.TrimEnd().Equals(SearchRide.ToPlace) || Ride.ToPlace.Equals(SearchRide.ToPlace))
@@ -55,16 +54,17 @@ namespace Carpool.Core.Services
 
                             }
                         }
-                        else if ((Ride.Stops != null && Ride.Stops.TrimEnd().Equals(SearchRide.ToPlace) || Ride.ToPlace.Equals(SearchRide.ToPlace)))
+                        //if the matched raid has a single stop
+                        else if ((Ride.Stops != null && Ride.Stops.TrimEnd().Equals(SearchRide.ToPlace)) || Ride.ToPlace.Equals(SearchRide.ToPlace))
                             flag = true;
 
                         
                     }
                     if (flag)
-                        res.Add(Ride);
+                        MatchedRides.Add(Ride);
 
                 }
-                return res;
+                return MatchedRides;
             }
             catch
             { return new List<OfferedRide>();}
@@ -105,9 +105,8 @@ namespace Carpool.Core.Services
 
                 return DBObject.CreateNewOfferedRide(NewRide);
             }
-            else 
-            { return "do login"; }
-            
+            else
+            { return "do login"; }    
 
         }
 
@@ -124,8 +123,6 @@ namespace Carpool.Core.Services
 
                         NewRideBook.BookedBy = Email;
                         NewRideBook.Price = Ride.Price * NewRideBook.Seats;
-                        
-
                         Ride.Seats -= NewRideBook.Seats;
                         DBObject.CreateNewBookedRide(NewRideBook);
                         DBObject.UpdateOfferedRide(Ride);
@@ -181,6 +178,10 @@ namespace Carpool.Core.Services
                     res.Add(item: DBObject.GetOfferedRideById(Booked.OfferId));
             return res;
 
+        }
+        public string GetEmail()
+        {
+            return Email;
         }
     }
 }
