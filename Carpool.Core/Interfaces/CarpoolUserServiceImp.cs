@@ -9,6 +9,7 @@ namespace Carpool.Core.Interfaces
 {
     public  interface CarpoolUserServiceImp
     {
+        
         public bool IsAuthorized();
         public string Signup(User NewUser);
         public string Login(User ExistingUser);

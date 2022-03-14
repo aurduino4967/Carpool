@@ -12,53 +12,49 @@ namespace Carpool.Web.Controllers
     [ApiController]
     public class CarpoolController : ControllerBase
     {
-
-        private readonly CarpoolUserService user=new CarpoolUserService(new CarpoolDBService());
-        private readonly Mapper mapper = new();
+        private readonly CarpoolUserServiceImp User =  CarpoolUserService.Instance;
+        private readonly DTOMapper Mapper=new DTOMapper();
+        
         //to sign in 
-    
         [HttpPost("Signup")]
-        public IActionResult Signup([FromBody] UserDTO Newuser )
+        public IActionResult Signup([FromBody] UserDTO newUser )
         {
-            return Ok(user.Signup(mapper.Map(Newuser)));
+            return Ok(User.Signup(Mapper.Map(newUser)));
         }
 
         //to login to the portal
         [HttpGet("login/{id,password}")]
         public IActionResult Login(string id,string password)
         {
-            UserDTO ExistingUser = new()
+            UserDTO existingUser = new()
             {
                 Uname = id,
                 Password = password,
             };
-             return Ok(user.Login(mapper.Map(ExistingUser)));
+             return Ok(User.Login(Mapper.Map(existingUser)));
         }
     
-
         // POST api/<tpoolController>
         [HttpPost("OfferRide")]
-        public IActionResult OfferRide([FromBody] OfferedRidePostDTO Ride)
+        public IActionResult OfferRide([FromBody] OfferedRidePostDTO ride)
         {
-            return Ok(user.OfferRide(mapper.Map(Ride)));
+            return Ok(User.OfferRide(Mapper.Map(ride)));
 
         }
-
 
         //to book a ride
         [HttpPost("BookRide")]
-        public IActionResult BookRide([FromBody] BookRidePostDTO Ride)
+        public IActionResult BookRide([FromBody] BookRidePostDTO ride)
         {
-            return Ok(user.BookRide(mapper.Map(Ride)));
+            return Ok(User.BookRide(Mapper.Map(ride)));
         }
-
 
         //to know the available rides 
         [HttpGet("AvailableRides/{date,time,fromplace,toplace,seats}")]
         public IEnumerable<OfferedRideDTO> AvailableRides(DateTime date, string time, string fromplace, string toplace, int seats)
         {
-            List<OfferedRideDTO> res = new();
-            OfferedRide SearchRide = new()
+            List<OfferedRideDTO> availableRidesList = new();
+            OfferedRide searchRide = new()
             {
                 Date = date,
                 Time = time,
@@ -67,36 +63,28 @@ namespace Carpool.Web.Controllers
                 Seats = seats,
 
             };
-            foreach (OfferedRide Ride in user.AvailableRides(SearchRide))
+            foreach (OfferedRide ride in User.AvailableRides(searchRide))
             {
-                res.Add(mapper.Map(Ride));
+                availableRidesList.Add(Mapper.Map(ride));
             }
-            return res;
+            return availableRidesList;
         }
 
-
         // GET: api/<tpoolController>
-        //to get the history of rides 
         [HttpGet("History")]
         public IEnumerable<OfferedRideDTO> History()
         {
             List<OfferedRideDTO> res = new();
-            foreach (OfferedRide Ride in user.OfferedRides())
+            foreach (OfferedRide ride in User.OfferedRides())
             {
-                res.Add(mapper.Map(Ride));
-
+                res.Add(Mapper.Map(ride));
             }
-            foreach (OfferedRide Ride in user.BookedRides())
+            foreach (OfferedRide ride in User.BookedRides())
             {
-                res.Add(mapper.Map(Ride));
+                res.Add(Mapper.Map(ride));
             }
             return res;
         }
-        [HttpGet("IsAuthorized")]
-        public IActionResult IsAuthorized()
-        {
-            return Ok(user.GetEmail());
-        }
-       
+
     }
 }

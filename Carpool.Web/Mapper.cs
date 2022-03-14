@@ -2,7 +2,7 @@
 using Carpool.Web.ViewModels;
 namespace Carpool.Web.Mappers
 { 
-    public class Mapper
+    public class DTOMapper
     {
 
         public OfferedRideDTO Map(OfferedRide servicemodel)

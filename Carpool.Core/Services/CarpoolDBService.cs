@@ -15,13 +15,13 @@ namespace Carpool.Core.Services
         {
              Context = new CarpoolDBContext();
         }
-        public string CreateNewUser(User NewUser)
+        public string CreateNewUser(User newUser)
         {
             try
             {
-                Context.Users.Add(NewUser);
+                Context.Users.Add(newUser);
                 Context.SaveChanges();
-                return "done succcessfully";
+                return "Account Created Successfully";
             }
             catch (Exception e)
             {
@@ -36,9 +36,9 @@ namespace Carpool.Core.Services
             return rides;
         }
 
-        public User? GetUser(User ExistingUser)
+        public User? GetUser(User existingUser)
         {
-                User? CurrentUser = Context.Users.SingleOrDefault(o => o.Uname.TrimEnd() == ExistingUser.Uname && o.Password.TrimEnd() == ExistingUser.Password);
+                User? CurrentUser = Context.Users.SingleOrDefault(o => o.Uname.TrimEnd() == existingUser.Uname && o.Password.TrimEnd() == existingUser.Password);
                 if (CurrentUser != null)
                     return CurrentUser;
                 else
@@ -46,34 +46,34 @@ namespace Carpool.Core.Services
            
  
         }
-        public string CreateNewOfferedRide(OfferedRide Ride)
+        public string CreateNewOfferedRide(OfferedRide ride)
         {
             try
             {
-                Context.OfferedRides.Add(Ride);
+                Context.OfferedRides.Add(ride);
                 Context.SaveChanges(true);
-                return "done successfully";
+                return "Ride Registered Successfully";
             }
             catch(Exception e)
             { return e.Message; }
         }
-        public void  CreateNewBookedRide(BookedRide Ride)
+        public void  CreateNewBookedRide(BookedRide ride)
         {
           
-                Context.BookedRides.Add(Ride);
+                Context.BookedRides.Add(ride);
                 Context.SaveChanges();
           
             
         }
-        public void UpdateOfferedRide(OfferedRide Ride)
+        public void UpdateOfferedRide(OfferedRide ride)
         {
-            Context.OfferedRides.Update(Ride);
+            Context.OfferedRides.Update(ride);
             Context.SaveChanges();
         }
 
-        public OfferedRide? GetOfferedRideById(string OfferId)
+        public OfferedRide? GetOfferedRideById(string offerId)
         {
-            return Context.OfferedRides.SingleOrDefault(o => o.OfferId == OfferId);
+            return Context.OfferedRides.SingleOrDefault(o => o.OfferId == offerId);
 
         }
         public List<BookedRide> GetBookedRides()
